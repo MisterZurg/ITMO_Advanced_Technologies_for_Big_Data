@@ -49,4 +49,6 @@ Performed by
 > 10.  Bare-metal deployment is forbidden. Deploy the storage with replicas, queues, generators, requesters and other modules using Kubernetes, docker (see: Kubernetes’ StatefulSet / Deployment / Job, etc.)  
 
 ## Architecture
-
+> [!WARNING]
+> TBD
+> ![img.png](img.png)
