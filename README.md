@@ -50,6 +50,6 @@ Performed by
 
 ## Architecture
 > [!WARNING]
-> TBD
-> 
+>
 > ![img.png](img.png)
+> 
