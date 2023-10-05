@@ -5,6 +5,7 @@ import (
 	"ITMO_Advanced_Technologies_for_Big_Data/internal/handlers"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"log"
 )

@@ -9,9 +9,9 @@ type Config struct {
 	DBUser     string `env:"POSTGRES_USER" envDefault:"postgres"`
 	DBPassword string `env:"POSTGRES_PASSWORD" envDefault:"password"`
 	DBName     string `env:"POSTGRES_DB" envDefault:"db"`
-	DBHost     string `env:"POSTGRES_HOST" envDefault:"localhost"` // "localhost"`
+	DBHost     string `env:"POSTGRES_HOST" envDefault:"localhost"` // "localhost"` 192.168.0.108
 	DBPort     string `env:"POSTGRES_PORT" envDefault:"5432"`
-	DBType     string `env:"DBTYPE" envDefault:"postgres"`
+	DBType     string `env:"DBTYPE" envDefault:"postgresql"`
 }
 
 func New() (*Config, error) {
