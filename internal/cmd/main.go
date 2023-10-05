@@ -3,16 +3,17 @@ package main
 import (
 	"ITMO_Advanced_Technologies_for_Big_Data/internal/config"
 	"ITMO_Advanced_Technologies_for_Big_Data/internal/handlers"
+	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"log"
 )
 
 var (
 	err    error
 	Cfg    *config.Config
-	Db     *sqlx.DB
+	Db     *sql.DB
 	Server *gin.Engine
 )
 
@@ -25,8 +26,11 @@ func init() {
 		return
 	}
 	pgDSN := config.GetPostgresConnectionString(Cfg.DBType, Cfg.DBUser, Cfg.DBPassword, Cfg.DBHost, Cfg.DBPort, Cfg.DBName)
-	Db, err = sqlx.Connect("pgx", pgDSN)
-	if err != nil {
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		Cfg.DBHost, Cfg.DBPort, Cfg.DBUser, Cfg.DBPassword, Cfg.DBName)
+	Db, err = sql.Open("postgres", psqlInfo)
+	if nil != err {
 		fmt.Println(pgDSN)
 		log.Fatal("Cannot connect to Postgres")
 	}
@@ -36,4 +40,5 @@ func init() {
 func main() {
 	router := Server.Group("/api")
 	router.GET("/ping", handlers.Ping)
+	log.Fatal(Server.Run(":8080"))
 }

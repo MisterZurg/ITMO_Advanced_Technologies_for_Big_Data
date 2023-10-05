@@ -1,14 +1,14 @@
 package handlers
 
 import (
+	"database/sql"
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
 )
 
 var (
-	Db *sqlx.DB
+	Db *sql.DB
 )
 
 type CreateLogRequest struct {
