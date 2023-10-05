@@ -18,6 +18,12 @@ type CreateLogRequest struct {
 	ErrorStatus int
 }
 
+func Ping10(ctx *gin.Context) {
+	for i := 0; i < 10; i++ {
+		Ping(ctx)
+	}
+}
+
 func Ping(ctx *gin.Context) {
 	req := CreateLogRequest{
 		LevelOfMsg:  1,

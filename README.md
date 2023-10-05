@@ -17,10 +17,10 @@ Performed by
 ## Logs, metrics and business processes.
 > [!NOTE]
 > Imagine we have a web platform for online sales. Users may visit and view different pages on the platform’s website and perform various operations, mainly: reserving, buying, refunding, canceling reservations. The platform is implemented as a fleet of micro services and to perform financial transactions may communicate with external services (thus they are out of our control) depending on the user’s prefered way and provider to make payment. Multiple micro-services participate in processing every operation thus it is guaranteed that each has a unique ID associated with it, staying preserved across all microservices. Users may make mistakes when they reserve or buy, external services may be temporarily unavailable or overloaded to process payment requests. The platform’s software and the external services also may contain bugs that lead to various errors.
-   This fleet constantly  generates logs, metrics and database records. The business wants these logs and metrics to be collected to calculate various statistics and to check for performance problems, errors and anomalies. You need to build a system that may serve analytical queries, raise alerts when anomalies are detected and fill dashboards dedicated for monitoring (not realtime, but close to it).
-   Incoming data of the last month should be stored in a “hot” storage for fast operative access while older data should be moved to the archive on S3. Alerts should be raised either instantly or in a matter of a few minutes if the event is complex (for example, multiple unsuccessful retries for several users with the same payment provider).
-   To make your task a little less difficult, there already exists an infrastructure for data collecting from above-mentioned sources that writes collected data into a message queue system. Thus you only need to integrate with this MQ, not with the whole fleet.
-   Examples of possible user queries that needs to be satisfied:
+This fleet constantly  generates logs, metrics and database records. The business wants these logs and metrics to be collected to calculate various statistics and to check for performance problems, errors and anomalies. You need to build a system that may serve analytical queries, raise alerts when anomalies are detected and fill dashboards dedicated for monitoring (not realtime, but close to it).
+Incoming data of the last month should be stored in a “hot” storage for fast operative access while older data should be moved to the archive on S3. Alerts should be raised either instantly or in a matter of a few minutes if the event is complex (for example, multiple unsuccessful retries for several users with the same payment provider).
+To make your task a little less difficult, there already exists an infrastructure for data collecting from above-mentioned sources that writes collected data into a message queue system. Thus you only need to integrate with this MQ, not with the whole fleet.
+Examples of possible user queries that needs to be satisfied:
 > 1. 	Get all events across different microservices related to the same action ID (e.g. request tracing).
 > 2. 	Get events by specific event level (debug/info/warn/error) and their type of one or more microservices for a specific interval.
 > 3. 	Number of simultaneous users viewing / buying
@@ -29,10 +29,10 @@ Performed by
 >    - page views per interval (15 minutes / 1 hour / 3 hour / 1 day)
 >    - retries with successful or unsuccessful outcomes (eventual ones)
 > 5. Performance:
->    - operation execution time (min, max, average, percentiles);
+     >    - operation execution time (min, max, average, percentiles);
 >    - CPU / RAM consumption per interval simultaneously with number of users
 > 6. Anomalies:
->    - multitude of same operations;
+     >    - multitude of same operations;
 >    - buying and refunding, etc.
 
 > [!IMPORTANT]
@@ -46,10 +46,18 @@ Performed by
 > 7. Data generator(-s) and ingestion procedure is a must (note: one can use libraries to fake logs, for instance https://github.com/mingrammer/flog).
 > 8. Generators of request workload should be implemented. The storage should be able to insert and process select queries simultaneously.
 > 9. Test scenarios should be implemented as a demo of the solution.
-> 10.  Bare-metal deployment is forbidden. Deploy the storage with replicas, queues, generators, requesters and other modules using Kubernetes, docker (see: Kubernetes’ StatefulSet / Deployment / Job, etc.)  
+> 10.  Bare-metal deployment is forbidden. Deploy the storage with replicas, queues, generators, requesters and other modules using Kubernetes, docker (see: Kubernetes’ StatefulSet / Deployment / Job, etc.)
 
 ## Architecture
 > [!WARNING]
->
+> WIP
 
-![img.png](img.png) 
+![img.png](img.png)
+
+## Used dependencies and tools
+* [gin](https://github.com/gin-gonic/gin) is a web framework written in Go.
+* [sqlx](https://github.com/jmoiron/sqlx) extension on go's standard database/sql
+* [pgx](https://github.com/jackc/pgx) pure Go driver and toolkit for PostgreSQL
+* [pq](https://github.com/lib/pq) pure Go postgres driver for Go's database/sql package (sub branch)
+* [env](https://github.com/caarlos0/env) simple and zero-dependencies library to parse environment variables into structs
+* [goose](https://github.com/pressly/goose) database migration tool

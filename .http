@@ -1,8 +1,15 @@
-# Метод создания сегмента.
+# Создание 1 лога
 GET /api/ping HTTP/1.1
 Host: localhost:8080
 Content-Type: application/json
 Accept: */*
 
+###
+
+# Создание 10 логов
+GET /api/ping10 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Accept: */*
 
 ###

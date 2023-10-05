@@ -37,5 +37,6 @@ func init() {
 func main() {
 	router := Server.Group("/api")
 	router.GET("/ping", handlers.Ping)
+	router.GET("/ping10", handlers.Ping10)
 	log.Fatal(Server.Run(":8080"))
 }
