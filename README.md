@@ -50,6 +50,14 @@ Performed by
 
 ## Architecture
 > [!WARNING]
->
+> TBU
 
 ![img.png](img.png) 
+
+## Used dependencies and tools
+* [gin](https://github.com/gin-gonic/gin) is a web framework written in Go.
+* [sqlx](https://github.com/jmoiron/sqlx) extension on go's standard database/sql
+* [pgx](https://github.com/jackc/pgx) pure Go driver and toolkit for PostgreSQL
+* [pgq](https://github.com/lib/pq) pure Go postgres driver for Go's database/sql package (sub branch)
+* [env](https://github.com/caarlos0/env) simple and zero-dependencies library to parse environment variables into structs
+* [goose](https://github.com/pressly/goose) database migration tool
