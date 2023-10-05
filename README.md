@@ -61,3 +61,41 @@ Examples of possible user queries that needs to be satisfied:
 * [pq](https://github.com/lib/pq) pure Go postgres driver for Go's database/sql package (sub branch)
 * [env](https://github.com/caarlos0/env) simple and zero-dependencies library to parse environment variables into structs
 * [goose](https://github.com/pressly/goose) database migration tool
+
+## Problems and things to solve
+
+### Fields to be added
+- application name 
+- hostname
+- module/logger name
+- source file name
+- line number
+- text of the message
+
+### Use-case scenarios
+1. logs with error messages, alongside source and line number
+2. (service owner story): logs with a particular source 
+3. only fresh logs (indexation by timestamp)
+4. certain level of message (debugging mostly)
+5. particular library in other services (certain module)
+6. by K8s node or Docker container
+
+Important to be able to view a chunk of information, not the whole thing!
+
+### Problems of our way
+- inserting a new log triggers updates of existing indices
+- no way of filtering the messages for the user
+- usage of all fields _always_ - not needed
+- almost continuous timestamp - a big index
+
+### Points about streaming solutions
+- Stream is not ordered
+- Reindexing of data takes time
+
+### Paths to ascend
+- LSM (implemented in clickhouse)
+- Clickhouse dynamically manages partitions which is easier than optimizing PSQL
+- Splitting tables (by date for example)
+- Less precise timestamp indexation
+- Presorting data to improve performance
+- Automatic reindexing (instead of nightly reindexing in PSQL)
