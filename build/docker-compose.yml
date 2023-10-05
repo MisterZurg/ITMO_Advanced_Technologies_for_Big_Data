@@ -1,25 +1,25 @@
 version: "3.9"
 
 services:
-#  big-app:
-#    container_name: big-app
-#    environment:
-#      POSTGRES_HOST: "big-db"
-#    build:
-#      context: ../
-#      dockerfile: ./build/app/Dockerfile
-#      args:
-#        LOCAL: "true"
-#    ports:
-#      - "8080:8080"
-#      - "8090:8090"
-#    depends_on:
-#      - big-db
-#    links:
-#      - big-db
-#    networks:
-#      - big-dev
-#    restart: always
+  big-app:
+    container_name: big-app
+    environment:
+      POSTGRES_HOST: "big-db"
+    build:
+      context: ../
+      dockerfile: ./build/app/Dockerfile
+      args:
+        LOCAL: "true"
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    depends_on:
+      - big-db
+    links:
+      - big-db
+    networks:
+      - big-dev
+    restart: always
 
   big-db:
     container_name: big-db
