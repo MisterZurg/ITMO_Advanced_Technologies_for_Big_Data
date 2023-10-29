@@ -27,7 +27,7 @@ services:
       POSTGRES_HOST: "big-db"
     build:
       context: ../
-      dockerfile: ./build/db/Dockerfile
+      dockerfile: db/postgres/Dockerfile
       args:
         LOCAL: "true"
     restart: always

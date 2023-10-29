@@ -28,3 +28,13 @@ func GetPostgresConnectionString(DBType, DBUser, DBPassword, DBHost, DBPort, DBN
 		DBType, DBUser, DBPassword, DBHost, DBPort, DBName)
 	return dsn
 }
+
+func GetClickHouseConnectionString(DBType, DBUser, DBPassword, DBHost, DBPort, DBName string) string {
+	// dial_timeout - a duration string is a possibly signed sequence of decimal numbers, each with optional fraction and a unit suffix such as "300ms", "1s". Valid time units are "ms", "s", "m". (default 30s)
+	// connection_open_strategy - round_robin/in_order
+	// clickhouse://username:password@host1:9000,host2:9000/database?dial_timeout=200ms&max_execution_time=60
+	dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s?dial_timeout=200ms&max_execution_time=60",
+		DBType, DBUser, DBPassword, DBHost, DBPort,
+	)
+	return dsn
+}
