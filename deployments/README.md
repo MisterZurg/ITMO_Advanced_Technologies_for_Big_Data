@@ -8,3 +8,6 @@
 
 Make shure that you have instaled [terraform](https://developer.hashicorp.com/terraform/downloads)
 
+```sh
+terraform apply --var-file="vars.tfvars"
+```
