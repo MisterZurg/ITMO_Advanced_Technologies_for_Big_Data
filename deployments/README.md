@@ -7,7 +7,9 @@
 > - [OpenStack Provider](https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs)
 
 Make shure that you have instaled [terraform](https://developer.hashicorp.com/terraform/downloads)
-
 ```sh
-terraform apply --var-file="vars.tfvars"
+terraform --version
 ```
+
+
+Here stored cofings for network & server deployment
