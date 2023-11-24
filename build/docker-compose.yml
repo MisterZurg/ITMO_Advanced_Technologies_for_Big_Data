@@ -1,43 +1,50 @@
 version: "3.9"
 
 services:
-  big-app:
-    container_name: big-app
+#  big-app:
+#    container_name: big-app
+#    environment:
+#      POSTGRES_HOST: "big-db"
+#    build:
+#      context: ../
+#      dockerfile: ./build/app/Dockerfile
+#      args:
+#        LOCAL: "true"
+#    ports:
+#      - "8080:8080"
+#      - "8090:8090"
+#    depends_on:
+#      - big-db
+#    links:
+#      - big-db
+#    networks:
+#      - big-dev
+#    restart: always
+#
+#  big-db:
+#    container_name: big-db
+#    environment:
+#      POSTGRES_HOST: "big-db"
+#    build:
+#      context: ../
+#      dockerfile: db/postgres/Dockerfile
+#      args:
+#        LOCAL: "true"
+#    restart: always
+#    networks:
+#      - big-dev
+#    hostname: big-db
+#    ports:
+#      - "5432:5432"
+  shit-house:
+    image: clickhouse/clickhouse-server:latest
     environment:
-      POSTGRES_HOST: "big-db"
-    build:
-      context: ../
-      dockerfile: ./build/app/Dockerfile
-      args:
-        LOCAL: "true"
+      CLICKHOUSE_USER: shittyshiter
+      CLICKHOUSE_PASSWORD: suckass
     ports:
-      - "8080:8080"
-      - "8090:8090"
-    depends_on:
-      - big-db
-    links:
-      - big-db
-    networks:
-      - big-dev
-    restart: always
-
-  big-db:
-    container_name: big-db
-    environment:
-      POSTGRES_HOST: "big-db"
-    build:
-      context: ../
-      dockerfile: db/postgres/Dockerfile
-      args:
-        LOCAL: "true"
-    restart: always
-    networks:
-      - big-dev
-    hostname: big-db
-    ports:
-      - "5432:5432"
-
+       - "18123:8123"
+       - "19000:9000"
 # Share network
-networks:
-  big-dev:
-    driver: bridge
+#networks:
+#  big-dev:
+#    driver: bridge

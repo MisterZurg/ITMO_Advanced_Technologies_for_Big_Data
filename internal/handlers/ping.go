@@ -1,14 +1,17 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	// "github.com/jmoiron/sqlx"
 )
 
 var (
-	Db *sqlx.DB
+	DB *sqlx.DB
+	//  *sql.Conn
 )
 
 type CreateLogRequest struct {
@@ -37,7 +40,7 @@ func Ping(ctx *gin.Context) {
 			VALUES (CURRENT_TIMESTAMP, $1, $2, $3, $4)
 		`
 
-	_, err := Db.Exec(sqlStatement, req.LevelOfMsg, req.Pid, req.Source, req.ErrorStatus)
+	_, err := DB.Exec(sqlStatement, req.LevelOfMsg, req.Pid, req.Source, req.ErrorStatus)
 	if err != nil {
 		log.Fatal(err)
 	}

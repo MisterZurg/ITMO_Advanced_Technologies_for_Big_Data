@@ -1,20 +1,22 @@
 package main
 
 import (
-	"ITMO_Advanced_Technologies_for_Big_Data/internal/config"
-	"ITMO_Advanced_Technologies_for_Big_Data/internal/handlers"
 	"fmt"
-	"github.com/ClickHouse/clickhouse-go"
+	"log"
+
+	"github.com/ClickHouse/clickhouse-go/v2"
+	_ "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/jmoiron/sqlx"
-	"log"
+
+	"ITMO_Advanced_Technologies_for_Big_Data/internal/config"
+	"ITMO_Advanced_Technologies_for_Big_Data/internal/handlers"
 )
 
 var (
-	err    error
-	Cfg    *config.Config
-	Db     *sqlx.DB
+	err error
+	Cfg *config.Config
+	// Db     *sqlx.DB
 	Server *gin.Engine
 )
 
@@ -33,13 +35,83 @@ func init() {
 	//	log.Fatal("Cannot connect to Postgres")
 	//}
 
-	shitHouseDSN := config.GetClickHouseConnectionString(Cfg.DBType, Cfg.DBUser, Cfg.DBPassword, Cfg.DBHost, Cfg.DBPort, Cfg.DBName)
-	Db, err := clickhouse.Open(shitHouseDSN)
-	if err != nil {
-		//fmt.Println(pgDSN)
-		log.Fatal("Cannot connect to Postgres")
+	// shitHouseDSN := config.GetClickHouseConnectionString(Cfg.DBType, Cfg.DBUser, Cfg.DBPassword, Cfg.DBHost, Cfg.DBPort, Cfg.DBName)
+	//chCFG := config.DatabaseConfig{
+	//	Name:     "",
+	//	Host:     "localhost",
+	//	Port:     "18123",
+	//	User:     "shittyshiter",
+	//	Password: "suckass",
+	//}
+
+	// chDB := db.ConnectToClickHouse(chCFG)
+	// connStr := fmt.Sprintf("clickhouse://%s:%s/?user=%s&password=%s", chCFG.Host, chCFG.Port, chCFG.User, chCFG.Password)
+	// connStr := "clickhouse://localhost:18123/?user=shittyshiter&password=suckass"
+	//chDB, err := sqlx.Connect("clickhouse", connStr)
+	//if err != nil {
+	//	fmt.Println(connStr)
+	//	log.Fatal("Cannot connect to ShitHouse")
+	//}
+	//if err := chDB.Ping(); err != nil {
+	//	log.Fatal("Cannot PING shit to ShitHouse")
+	//}
+	chDB := clickhouse.OpenDB(&clickhouse.Options{
+		Addr: []string{"localhost:18123"},
+		Auth: clickhouse.Auth{
+			Database: "",
+			Username: "shittyshiter",
+			Password: "suckass",
+		},
+		Protocol: clickhouse.HTTP,
+	})
+	if err := chDB.Ping(); err != nil {
+		log.Fatal("Cannot PING shit to ShitHouse")
 	}
-	handlers.Db = Db
+	fmt.Println("ДРОЧИТЬ")
+	/*
+		docker run --rm -e CLICKHOUSE_DB=my_database \
+		-e CLICKHOUSE_USER=username \
+		-e CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1 \
+		-e CLICKHOUSE_PASSWORD=password \
+		-p 9000:9000/tcp clickhouse/clickhouse-server
+	*/
+
+	//_, err = chDB.Exec(`
+	//	CREATE TABLE IF NOT EXISTS example (
+	//		  Col1 UInt8
+	//		, Col2 String
+	//		, Col3 FixedString(3)
+	//		, Col4 UUID
+	//		, Col5 Map(String, UInt8)
+	//		, Col6 Array(String)
+	//		, Col7 Tuple(String, UInt8, Array(Map(String, String)))
+	//		, Col8 DateTime
+	//	) Engine = Memory
+	//`)
+	//if err != nil {
+	//	log.Fatal("Cannot Shit in ShitHouse")
+	//}
+
+	//dsn := "tcp://127.0.0.1:18123?debug=true"
+	//db, err := sql.Open("clickhouse", dsn)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//defer db.Close()
+	//
+	//// Create the "users" table
+	//_, err = db.Exec(`
+	//	CREATE TABLE IF NOT EXISTS users (
+	//		id UInt64,
+	//		name String,
+	//		age UInt8
+	//	) ENGINE = Memory
+	//`)
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	// handlers.DB = chDB
 }
 
 func main() {

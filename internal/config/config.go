@@ -14,6 +14,14 @@ type Config struct {
 	DBType     string `env:"DBTYPE" envDefault:"postgresql"`
 }
 
+type DatabaseConfig struct {
+	Name     string
+	Host     string
+	Port     string
+	User     string
+	Password string
+}
+
 func New() (*Config, error) {
 	cfg := &Config{}
 	err := env.Parse(cfg)
