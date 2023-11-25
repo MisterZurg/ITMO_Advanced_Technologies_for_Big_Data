@@ -1,13 +1,14 @@
+-- TODO: CHECK Fields and STuff
 CREATE TABLE IF NOT EXISTS logs
 (
-    log_id       SERIAL PRIMARY KEY,
-    timestamp    TIMESTAMP,
-    level_of_msg INT,
-    application  TEXT,
-    hostname     TEXT,
-    logger       name,
-    source       TEXT,
-    pid          INT,
-    error_status INT,
-    message      TEXT
-);
+    log_id       UInt32,
+    timestamp    DateTime('Europe/Moscow'),
+    level_of_msg UInt8,
+    application  String,
+    hostname     String,
+    logger_name  String,
+    source       String,
+    pid          UInt32,
+    error_status UInt32,
+    message      String
+) Engine = Memory

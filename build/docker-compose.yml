@@ -44,6 +44,9 @@ services:
     ports:
        - "18123:8123"
        - "19000:9000"
+    volumes:
+      - "../internal/db/clickhouse/clickhouse_init.sql:/docker-entrypoint-initdb.d/clickhouse_init.sql"
+
 # Share network
 #networks:
 #  big-dev:
