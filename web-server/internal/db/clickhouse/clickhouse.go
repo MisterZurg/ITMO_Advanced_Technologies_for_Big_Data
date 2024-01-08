@@ -1,13 +1,12 @@
 package db
 
 import (
+	"ITMO_Advanced_Technologies_for_Big_Data/web-server/internal/config"
 	"fmt"
 	"log"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/jmoiron/sqlx"
-
-	"ITMO_Advanced_Technologies_for_Big_Data/internal/config"
 )
 
 func makeAddr(cfg config.DatabaseConfig) string {

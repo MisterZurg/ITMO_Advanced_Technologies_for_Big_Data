@@ -9,7 +9,7 @@ COPY ../../go.sum ./
 
 RUN go mod download && go mod verify
 
-COPY ../../internal ./internal
+COPY ../../web-server/internal ./internal
 
 
 RUN mkdir -p /usr/local/bin/

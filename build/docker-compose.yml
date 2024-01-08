@@ -21,21 +21,6 @@ services:
 #      - big-dev
 #    restart: always
 #
-#  big-db:
-#    container_name: big-db
-#    environment:
-#      POSTGRES_HOST: "big-db"
-#    build:
-#      context: ../
-#      dockerfile: db/postgres/Dockerfile
-#      args:
-#        LOCAL: "true"
-#    restart: always
-#    networks:
-#      - big-dev
-#    hostname: big-db
-#    ports:
-#      - "5432:5432"
 #  shit-house:
 #    image: clickhouse/clickhouse-server:latest
 #    environment:
@@ -47,86 +32,60 @@ services:
 #    volumes:
 #      - "../internal/db/clickhouse/clickhouse_init.sql:/docker-entrypoint-initdb.d/clickhouse_init.sql"
 
-#  zookeeper:
-#    image: confluentinc/cp-zookeeper:latest
-#    environment:
-#      - ZOOKEEPER_CLIENT_PORT=2181
-#    networks:
-#      - kafka-network
-#    expose:
-#      - "2181"
-#    ports:
-#      - "2181:2181"
-#
 #  kafka:
-#    image: confluentinc/cp-kafka:latest
-#    depends_on:
-#      - zookeeper
-#    environment:
-#      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-#      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-#    networks:
-#      - kafka-network
-#    ports:
-#      - '9092:9092'
-#      - '8082:8082'
-#      - '8083:8083'
-
-#  zookeeper:
-#    hostname: zookeeper
-#    image: wurstmeister/zookeeper:3.4.6
-#    expose:
-#      - "2181"
-#    ports:
-#      - "2181:2181"
-
-#  kafka:
-#    image: wurstmeister/kafka
-#    environment:
-#      KAFKA_ADVERTISED_HOST_NAME: kafka
-#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#      KAFKA_CONNECT_BOOTSTRAP_SERVERS: localhost:9092
-#
-#      KAFKA_CONNECT_REST_PORTL: 8082
-#      KAFKA_CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
-#
-#      KAFKA_CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-#      KAFKA_CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-#      KAFKA_CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: 0
-#      KAFKA_CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: 0
-#
-#      KAFKA_CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-#      KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-#      KAFKA_CONNECT_INTERNAL_KEY_CONVERTER_SCHEMAS_ENABLE: 0
-#      KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER_SCHEMAS_ENABLE: 0
-#
-#      KAFKA_CONNECT_OFFSET_STORAGE_FILE_FILENAME: "/tmp/connect.offsets"
-#      # Flush much faster than normal, which is useful for testing/debugging
-#      KAFKA_CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+#    image: confluentinc/cp-kafka:6.1.1
 #    depends_on:
 #      - zookeeper
 #    ports:
 #      - '9092:9092'
-#      - '8082:8082'
-#      - '8083:8083'
+#    expose:
+#      - '29092'
+#    environment:
+#      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+#      KAFKA_MIN_INSYNC_REPLICAS: '1'
 
-  kafka:
-    image: docker.io/bitnami/kafka:3.5
-    ports:
-      - "9092:9092"
-    volumes:
-      - "kafka_data:/bitnami"
-    environment:
-      # KRaft settings
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      # Listeners
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    kafka-server:
+      image: bitnami/kafka:latest
+      container_name: kafka-server
+      hostname: kafka-server
+      ports:
+        - "9092:9092"
+      volumes:
+        - "kafka_data:/bitnami"
+      environment:
+        - KAFKA_CFG_NODE_ID=0
+        - KAFKA_CFG_PROCESS_ROLES=controller,broker
+        - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+        - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+        - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-server:9093
+        - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      networks:
+        - app-tier
+
+#    init-kafka:
+#      image: bitnami/kafka:latest
+#      container_name: init-kafka
+#      hostname: init-kafka
+#      depends_on:
+#        - kafka-server
+#      entrypoint: [ '/bin/sh', '-c' ]
+#      command: |
+#        "
+#        # blocks until kafka is reachable
+#        kafka-topics.sh --list --bootstrap-server kafka-server:9092
+#
+#        echo -e 'Creating kafka topics'
+#        kafka-topics.sh --create --if-not-exists --topic my-topic --replication-factor 1 --partitions 1 --bootstrap-server kafka-server:9092
+#
+#        echo -e 'Successfully created the following topics:'
+#        kafka-topics.sh --list --bootstrap-server kafka-server:9092
+#        "
+#      networks:
+#        - app-tier
 
 volumes:
   kafka_data:
@@ -134,5 +93,5 @@ volumes:
 
 # Share network
 networks:
-  kafka-network:
+  app-tier:
     driver: bridge
