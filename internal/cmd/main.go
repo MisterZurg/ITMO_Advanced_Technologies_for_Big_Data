@@ -2,11 +2,9 @@ package main
 
 import (
 	"ITMO_Advanced_Technologies_for_Big_Data/internal/config"
-	"fmt"
 	_ "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/segmentio/kafka-go"
 )
 
 var (
@@ -138,25 +136,25 @@ func main() {
 	//	panic(err.Error())
 	//}
 
-	conn, err := kafka.Dial("tcp", "localhost:9092")
-	if err != nil {
-		panic(err.Error())
-	}
-	defer conn.Close()
-
-	partitions, err := conn.ReadPartitions()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	m := map[string]struct{}{}
-
-	for _, p := range partitions {
-		m[p.Topic] = struct{}{}
-	}
-	for k := range m {
-		fmt.Println(k)
-	}
+	//conn, err := kafka.Dial("tcp", "localhost:9092")
+	//if err != nil {
+	//	panic(err.Error())
+	//}
+	//defer conn.Close()
+	//
+	//partitions, err := conn.ReadPartitions()
+	//if err != nil {
+	//	panic(err.Error())
+	//}
+	//
+	//m := map[string]struct{}{}
+	//
+	//for _, p := range partitions {
+	//	m[p.Topic] = struct{}{}
+	//}
+	//for k := range m {
+	//	fmt.Println(k)
+	//}
 	//fmt.Println("H1")
 	//topic := "my-topic-1"
 	//partition := 1

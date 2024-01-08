@@ -109,6 +109,7 @@ services:
 #      - '9092:9092'
 #      - '8082:8082'
 #      - '8083:8083'
+
   kafka:
     image: docker.io/bitnami/kafka:3.5
     ports:

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/segmentio/kafka-go"
 	"log"
 	"net/http"
 
@@ -46,4 +47,22 @@ func Ping(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Pong"})
+}
+
+func PingKafka(kafkaWriter *kafka.Writer) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//body, err := ioutil.ReadAll(req.Body)
+		//if err != nil {
+		//	log.Fatalln(err)
+		//}
+		msg := kafka.Message{
+			Value: []byte("Китайская скороговорка 四是四 4 это 4!"),
+		}
+		err := kafkaWriter.WriteMessages(c, msg)
+		if err != nil {
+			// wrt.Write([]byte(err.Error()))
+			log.Fatalln(err)
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Pong"})
+	}
 }
