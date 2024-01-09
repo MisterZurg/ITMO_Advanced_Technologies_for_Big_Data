@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/segmentio/kafka-go"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/segmentio/kafka-go"
 )
 
 func Ping(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.Request) {
