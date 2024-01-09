@@ -69,38 +69,46 @@ services:
     networks:
       - app-tier
 
-  consumer:
-    container_name: consumer
-    build:
-      context: .
-      dockerfile: consumer/Dockerfile
-    restart: always
-    environment:
-      kafkaURL: kafka:9092
-      topic: my-topic
-    depends_on:
-      - init-kafka
-      - kafka
-    networks:
-      - app-tier
+#  consumer:
+#    container_name: consumer
+#    build:
+#      context: .
+#      dockerfile: consumer/Dockerfile
+#    restart: always
+#    environment:
+#      kafkaURL: kafka:9092
+#      topic: my-topic
+#    depends_on:
+#      - init-kafka
+#      - kafka
+#    networks:
+#      - app-tier
+#
+#  ch-db:
+#    image: clickhouse/clickhouse-server:latest
+#    container_name: ch-db
+#    hostname: ch-db
+#    restart: always
+#    depends_on:
+#      - consumer
+#    environment:
+#      CLICKHOUSE_USER: LiBo
+#      CLICKHOUSE_PASSWORD: YiSheng
+#    ports:
+#      - "127.0.0.1:18123:8123"  # АЙПИ БЫЛ ВОТ ТУТ
+#      - "127.0.0.1:19000:9000"
+##    volumes:
+##      - "../consumer/clickhouse/clickhouse_init.sql:/docker-entrypoint-initdb.d/clickhouse_init.sql"
+#    networks:
+#      - app-tier
 
-  ch-db:
-    image: clickhouse/clickhouse-server:latest
-    container_name: ch-db
-    hostname: ch-db
-    restart: always
-    depends_on:
-      - consumer
-    environment:
-      CLICKHOUSE_USER: LiBo
-      CLICKHOUSE_PASSWORD: YiSheng
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "127.0.0.1:18123:8123"  # АЙПИ БЫЛ ВОТ ТУТ
-      - "127.0.0.1:19000:9000"
-#    volumes:
-#      - "../consumer/clickhouse/clickhouse_init.sql:/docker-entrypoint-initdb.d/clickhouse_init.sql"
-    networks:
-      - app-tier
+      - "18080:8080"
+      - "19090:9090"
 
 #volumes:
 #  kafka_data:
