@@ -1,0 +1,112 @@
+version: "3.9"
+
+services:
+  init-kafka:
+    image: wurstmeister/kafka
+    container_name: init-kafka
+    hostname: init-kafka
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics.sh --list --bootstrap-server kafka:9092
+
+      echo -e 'Creating kafka topics'
+      kafka-topics.sh --create --if-not-exists --topic my-topic --replication-factor 1 --partitions 1 --bootstrap-server kafka:9092
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics.sh --list --bootstrap-server kafka:9092
+      "
+    networks:
+      - app-tier
+
+  zookeeper:
+    container_name: zookeeper
+    hostname: zookeeper
+    image: wurstmeister/zookeeper:3.4.6
+    restart: always
+    expose:
+      - "2181"
+    ports:
+      - "2181:2181"
+    networks:
+      - app-tier
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    hostname: kafka
+    restart: always
+    env_file:
+      - kafka/kafka-variables.env
+    depends_on:
+      - zookeeper
+    ports:
+      - '9092:9092'
+      - '8082:8082'
+      - '8083:8083'
+    networks:
+      - app-tier
+
+  producer-api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: web-server/Dockerfile
+    environment:
+      kafkaURL: kafka:9092
+      topic: my-topic
+    restart: always
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - init-kafka
+      - kafka
+    networks:
+      - app-tier
+
+  consumer:
+    container_name: consumer
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    restart: always
+    environment:
+      kafkaURL: kafka:9092
+      topic: my-topic
+    depends_on:
+      - init-kafka
+      - kafka
+    networks:
+      - app-tier
+
+  ch-db:
+    image: clickhouse/clickhouse-server:latest
+    container_name: ch-db
+    hostname: ch-db
+    restart: always
+    depends_on:
+      - consumer
+    environment:
+      CLICKHOUSE_USER: LiBo
+      CLICKHOUSE_PASSWORD: YiSheng
+    ports:
+       - "8123:8123"
+       - "19000:9000"
+#    volumes:
+#      - "../consumer/clickhouse/clickhouse_init.sql:/docker-entrypoint-initdb.d/clickhouse_init.sql"
+    networks:
+      - app-tier
+
+#volumes:
+#  kafka_data:
+#    driver: local
+#
+## Share network
+networks:
+  app-tier:
+    driver: bridge
