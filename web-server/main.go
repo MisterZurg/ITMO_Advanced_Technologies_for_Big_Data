@@ -3,17 +3,34 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/segmentio/kafka-go"
 )
 
-func Ping(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.Request) {
+//type msg struct {
+//	log_id              UInt32
+//	timestamp           DateTime64(9)
+//	level_of_msg        UInt8
+//	application         String
+//	hostname            String
+//	logger_name         String
+//	source              String
+//	pid                 UInt32
+//	line                String
+//	error_status        UInt32
+//	message             String
+//}
+
+func Ping(kafkaWriter *kafka.Writer, id string) func(http.ResponseWriter, *http.Request) {
 	return func(wrt http.ResponseWriter, req *http.Request) {
+		//jsonMsg := json.Marshal()
 		msg := kafka.Message{
-			Key:   []byte("сы шы сы"),
-			Value: []byte("bu nihao"),
+			Key:   []byte("RNG:" + strconv.Itoa(rand.Int())),
+			Value: []byte("here we json.Marshal" + id),
 		}
 		err := kafkaWriter.WriteMessages(req.Context(), msg)
 
@@ -32,6 +49,7 @@ func getKafkaWriter(kafkaURL, topic string) *kafka.Writer {
 }
 
 func main() {
+	thisName := strconv.Itoa(rand.Int())
 	kafkaURL := os.Getenv("kafkaURL")
 	topic := os.Getenv("topic")
 
@@ -46,7 +64,7 @@ func main() {
 		fmt.Println("producer closed")
 	}()
 
-	http.HandleFunc("/", Ping(kafkaWriter))
+	http.HandleFunc("/", Ping(kafkaWriter, thisName))
 
 	fmt.Println("producer-api started")
 	log.Fatal(http.ListenAndServe(":8080", nil))
