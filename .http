@@ -1,6 +1,6 @@
 # Создание 1 лога
 GET /api/ping HTTP/1.1
-Host: localhost:18083
+Host: localhost:18081
 Content-Type: application/json
 Accept: */*
 

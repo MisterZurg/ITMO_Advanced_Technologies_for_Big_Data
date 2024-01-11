@@ -1,36 +1,50 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/segmentio/kafka-go"
 )
 
-//type msg struct {
-//	log_id              UInt32
-//	timestamp           DateTime64(9)
-//	level_of_msg        UInt8
-//	application         String
-//	hostname            String
-//	logger_name         String
-//	source              String
-//	pid                 UInt32
-//	line                String
-//	error_status        UInt32
-//	message             String
-//}
+type KafkaMessage struct {
+	LogID       int32     `json:"log_id"`
+	Timestamp   time.Time `json:"timestamp"`
+	LevelOfMsg  uint8     `json:"level_of_msg"`
+	Application string    `json:"application"`
+	Hostname    string    `json:"hostname"`
+	LoggerName  string    `json:"logger_name"`
+	Source      string    `json:"source"`
+	Pid         uint32    `json:"pid"`
+	Line        string    `json:"line"`
+	ErrorStatus uint32    `json:"error_status"`
+	Message     string    `json:"message"`
+}
 
 func Ping(kafkaWriter *kafka.Writer, id string) func(http.ResponseWriter, *http.Request) {
 	return func(wrt http.ResponseWriter, req *http.Request) {
-		//jsonMsg := json.Marshal()
+		marshaled, _ := json.Marshal(KafkaMessage{
+			LogID:       int32(rand.Int()),
+			Timestamp:   time.Now(),
+			LevelOfMsg:  1,
+			Application: "producer",
+			Hostname:    "big.data.com",
+			LoggerName:  "big.data.logger",
+			Source:      "producer/main.go",
+			Pid:         uint32(os.Getpid()),
+			Line:        "41",
+			ErrorStatus: 200,
+		})
+
 		msg := kafka.Message{
 			Key:   []byte("RNG:" + strconv.Itoa(rand.Int())),
-			Value: []byte("here we json.Marshal" + id),
+			Value: []byte(marshaled),
 		}
 		err := kafkaWriter.WriteMessages(req.Context(), msg)
 

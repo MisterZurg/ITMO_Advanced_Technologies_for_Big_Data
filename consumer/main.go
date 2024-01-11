@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/ClickHouse/ch-go"
 	"github.com/ClickHouse/ch-go/proto"
@@ -68,6 +69,20 @@ func connectToShitHouse(cfg *ClickConfig) (*sql.DB, error) {
 		return nil, err
 	}
 	return chDB, nil
+}
+
+type KafkaMessage struct {
+	LogID       int32     `json:"log_id"`
+	Timestamp   time.Time `json:"timestamp"`
+	LevelOfMsg  uint8     `json:"level_of_msg"`
+	Application string    `json:"application"`
+	Hostname    string    `json:"hostname"`
+	LoggerName  string    `json:"logger_name"`
+	Source      string    `json:"source"`
+	Pid         uint32    `json:"pid"`
+	Line        string    `json:"line"`
+	ErrorStatus uint32    `json:"error_status"`
+	Message     string    `json:"message"`
 }
 
 func main() {
@@ -143,17 +158,20 @@ func main() {
 		}
 		fmt.Printf("message at topic:%v partition:%v offset:%v\n%s = %s\n\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 
-		log_id.Append(uint32(1))
-		level_of_msg.Append(uint8(2))
+		var got KafkaMessage
+		_ = json.Unmarshal(m.Value, &got)
+
+		log_id.Append(uint32(got.LogID))
+		level_of_msg.Append(got.LevelOfMsg)
 		application.Append(string(m.Key))
-		hostname.Append(string(m.Value))
-		logger_name.Append("aboba")
-		source.Append("aboba")
-		pid.Append(uint32(3))
-		line.Append("aboba")
-		error_status.Append(uint32(4))
-		message.Append("aboba")
-		timestamp.Append(time.Now())
+		hostname.Append(got.Hostname)
+		logger_name.Append(got.LoggerName)
+		source.Append(got.Source)
+		pid.Append(got.Pid)
+		line.Append(got.Line)
+		error_status.Append(got.ErrorStatus)
+		message.Append(got.Message)
+		timestamp.Append(got.Timestamp)
 		//fmt.Printf("message at topic:%v partition:%v offset:%v\n%s = %s\n\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 
 		// Insert single data block.
