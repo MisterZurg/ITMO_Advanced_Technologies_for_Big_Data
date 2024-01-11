@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"math/rand"
 	"net/http"
@@ -26,6 +29,13 @@ type KafkaMessage struct {
 	ErrorStatus uint32    `json:"error_status"`
 	Message     string    `json:"message"`
 }
+
+var (
+	opsPing = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "ping_ops_total",
+		Help: "The total number of processed ping events",
+	})
+)
 
 func Ping(kafkaWriter *kafka.Writer, id string) func(http.ResponseWriter, *http.Request) {
 	return func(wrt http.ResponseWriter, req *http.Request) {
@@ -51,6 +61,8 @@ func Ping(kafkaWriter *kafka.Writer, id string) func(http.ResponseWriter, *http.
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		opsPing.Inc()
 	}
 }
 
@@ -79,6 +91,7 @@ func main() {
 	}()
 
 	http.HandleFunc("/", Ping(kafkaWriter, thisName))
+	http.Handle("/metrics", promhttp.Handler())
 
 	fmt.Println("producer-api started")
 	log.Fatal(http.ListenAndServe(":8080", nil))

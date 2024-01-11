@@ -157,6 +157,14 @@ services:
     networks:
       - app-tier
 
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "18070:8080"
+      - "19090:9090"
+
 #volumes:
 #  kafka_data:
 #    driver: local
