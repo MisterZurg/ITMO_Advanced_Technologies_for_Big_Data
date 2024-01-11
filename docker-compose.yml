@@ -50,19 +50,20 @@ services:
     networks:
       - app-tier
 
-  producer-api:
-#    container_name: api
+  producer-api-1:
+    #    container_name: producer
     build:
       context: .
       dockerfile: web-server/Dockerfile
     environment:
       kafkaURL: kafka:9092
       topic: my-topic
-    restart: always
+   #    restart: unless-stopped
     expose:
       - "8080"
     ports:
-      - "8080:8080"
+      - "18080:8080"
+
     depends_on:
       - init-kafka
       - kafka
@@ -70,7 +71,59 @@ services:
       - app-tier
     deploy:
       mode: replicated
-      replicas: 10
+      #      replicas: 5
+      restart_policy:
+        condition: on-failure
+      # https://docs.docker.com/compose/compose-file/deploy/#endpoint_mode
+      #      endpoint_mode: dnsrr
+
+  producer-api-2:
+         #    container_name: producer
+    build:
+      context: .
+      dockerfile: web-server/Dockerfile
+    environment:
+      kafkaURL: kafka:9092
+      topic: my-topic
+    #   restart: unless-stopped
+    expose:
+      - "8080"
+    ports:
+      - "18081:8080"
+    depends_on:
+      - init-kafka
+      - kafka
+    networks:
+      - app-tier
+    deploy:
+      mode: replicated
+      #      replicas: 5
+      restart_policy:
+        condition: on-failure
+
+  producer-api-3:
+       #    container_name: producer
+       build:
+         context: .
+         dockerfile: web-server/Dockerfile
+       environment:
+         kafkaURL: kafka:9092
+         topic: my-topic
+       #    restart: unless-stopped
+       expose:
+         - "8080"
+       ports:
+         - "18083:8080"
+       depends_on:
+         - init-kafka
+         - kafka
+       networks:
+         - app-tier
+       deploy:
+         mode: replicated
+         #      replicas: 5
+         restart_policy:
+           condition: on-failure
 
   consumer:
     container_name: consumer

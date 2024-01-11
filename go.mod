@@ -3,12 +3,12 @@ module ITMO_Advanced_Technologies_for_Big_Data
 go 1.21.0
 
 require (
+	github.com/ClickHouse/ch-go v0.61.1
 	github.com/ClickHouse/clickhouse-go/v2 v2.15.0
 	github.com/segmentio/kafka-go v0.4.47
 )
 
 require (
-	github.com/ClickHouse/ch-go v0.61.1 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/dmarkham/enumer v1.5.9 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
@@ -18,7 +18,6 @@ require (
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/pascaldekloe/name v1.0.1 // indirect
 	github.com/paulmach/orb v0.10.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.19 // indirect

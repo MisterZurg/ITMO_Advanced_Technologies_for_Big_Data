@@ -141,6 +141,8 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
+		fmt.Printf("message at topic:%v partition:%v offset:%v\n%s = %s\n\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+
 		log_id.Append(uint32(1))
 		level_of_msg.Append(uint8(2))
 		application.Append(string(m.Key))
