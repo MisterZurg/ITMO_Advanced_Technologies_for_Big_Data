@@ -8,43 +8,43 @@ services:
     ports:
       - "42:420"
     depends_on:
-      - kafka
+      - kafka-server
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
       # blocks until kafka is reachable
-      kafka-topics.sh --list --bootstrap-server kafka:9092
+      kafka-topics.sh --list --bootstrap-server kafka-server:9092
 
       echo -e 'Creating kafka topics'
-      kafka-topics.sh --create --if-not-exists --topic my-topic --replication-factor 1 --partitions 1 --bootstrap-server kafka:9092
+      kafka-topics.sh --create --if-not-exists --topic my-topic --replication-factor 1 --partitions 1 --bootstrap-server kafka-server:9092
 
       echo -e 'Successfully created the following topics:'
-      kafka-topics.sh --list --bootstrap-server kafka:9092
+      kafka-topics.sh --list --bootstrap-server kafka-server:9092
       "
     networks:
       - app-tier
 
-  # zookeeper:
-  #   container_name: zookeeper
-  #   hostname: zookeeper
-  #   image: wurstmeister/zookeeper:3.4.6
-  #   restart: always
-  #   expose:
-  #     - "2181"
-  #   ports:
-  #     - "2181:2181"
-  #   networks:
-  #     - app-tier
+  zookeeper:
+    container_name: zookeeper
+    hostname: zookeeper
+    image: wurstmeister/zookeeper:3.4.6
+    restart: always
+    # expose:
+    #   - "2181"
+    ports:
+      - "2181:2181"
+    networks:
+      - app-tier
 
-  kafka:
+  kafka-server:
     image: wurstmeister/kafka
-    container_name: kafka
-    hostname: kafka
+    container_name: kafka-server
+    hostname: kafka-server
     restart: always
     env_file:
       - kafka/kafka-variables.env
-    # depends_on:
-    #   - zookeeper
+    depends_on:
+      - zookeeper
     ports:
       - '9092:9092'
       - '8082:8082'
@@ -55,21 +55,22 @@ services:
   # producer-api-1:
   producer-api:
     #    container_name: producer
-    build:
-      context: .
-      dockerfile: web-server/Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: web-server/Dockerfile
+    image: dormant512/big-shit-producer:v420.69
     environment:
-      kafkaURL: kafka:9092
+      kafkaURL: kafka-server:9092
       topic: my-topic
    #    restart: unless-stopped
-    expose:
-      - "8080"
+    # expose:
+    #   - "8080"
     ports:
       - "18080:8080"
 
     depends_on:
       - init-kafka
-      - kafka
+      - kafka-server
     networks:
       - app-tier
     deploy:
@@ -130,18 +131,19 @@ services:
 
   consumer:
     container_name: consumer
-    build:
-      context: .
-      dockerfile: consumer/Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: consumer/Dockerfile
+    image: dormant512/big-shit-consumer:v420.69
     restart: always
     environment:
-      kafkaURL: kafka:9092
+      kafkaURL: kafka-server:9092
       topic: my-topic
     ports:
       - "69:420"
     depends_on:
       - init-kafka
-      - kafka
+      - kafka-server
       - ch-db
     networks:
       - app-tier
