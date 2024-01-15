@@ -99,3 +99,7 @@ Important to be able to view a chunk of information, not the whole thing!
 - Less precise timestamp indexation
 - Presorting data to improve performance
 - Automatic reindexing (instead of nightly reindexing in PSQL)
+
+### Deploy via K3S
+
+[K3S deploy](./k3s/README.md)

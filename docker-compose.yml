@@ -5,6 +5,8 @@ services:
     image: wurstmeister/kafka
     container_name: init-kafka
     hostname: init-kafka
+    ports:
+      - "42:420"
     depends_on:
       - kafka
     entrypoint: [ '/bin/sh', '-c' ]
@@ -22,17 +24,17 @@ services:
     networks:
       - app-tier
 
-  zookeeper:
-    container_name: zookeeper
-    hostname: zookeeper
-    image: wurstmeister/zookeeper:3.4.6
-    restart: always
-    expose:
-      - "2181"
-    ports:
-      - "2181:2181"
-    networks:
-      - app-tier
+  # zookeeper:
+  #   container_name: zookeeper
+  #   hostname: zookeeper
+  #   image: wurstmeister/zookeeper:3.4.6
+  #   restart: always
+  #   expose:
+  #     - "2181"
+  #   ports:
+  #     - "2181:2181"
+  #   networks:
+  #     - app-tier
 
   kafka:
     image: wurstmeister/kafka
@@ -41,8 +43,8 @@ services:
     restart: always
     env_file:
       - kafka/kafka-variables.env
-    depends_on:
-      - zookeeper
+    # depends_on:
+    #   - zookeeper
     ports:
       - '9092:9092'
       - '8082:8082'
@@ -50,7 +52,8 @@ services:
     networks:
       - app-tier
 
-  producer-api-1:
+  # producer-api-1:
+  producer-api:
     #    container_name: producer
     build:
       context: .
@@ -77,53 +80,53 @@ services:
       # https://docs.docker.com/compose/compose-file/deploy/#endpoint_mode
       #      endpoint_mode: dnsrr
 
-  producer-api-2:
-         #    container_name: producer
-    build:
-      context: .
-      dockerfile: web-server/Dockerfile
-    environment:
-      kafkaURL: kafka:9092
-      topic: my-topic
-    #   restart: unless-stopped
-    expose:
-      - "8080"
-    ports:
-      - "18081:8080"
-    depends_on:
-      - init-kafka
-      - kafka
-    networks:
-      - app-tier
-    deploy:
-      mode: replicated
-      #      replicas: 5
-      restart_policy:
-        condition: on-failure
+  # producer-api-2:
+  #        #    container_name: producer
+  #   build:
+  #     context: .
+  #     dockerfile: web-server/Dockerfile
+  #   environment:
+  #     kafkaURL: kafka:9092
+  #     topic: my-topic
+  #   #   restart: unless-stopped
+  #   expose:
+  #     - "8080"
+  #   ports:
+  #     - "18081:8080"
+  #   depends_on:
+  #     - init-kafka
+  #     - kafka
+  #   networks:
+  #     - app-tier
+  #   deploy:
+  #     mode: replicated
+  #     #      replicas: 5
+  #     restart_policy:
+  #       condition: on-failure
 
-  producer-api-3:
-       #    container_name: producer
-       build:
-         context: .
-         dockerfile: web-server/Dockerfile
-       environment:
-         kafkaURL: kafka:9092
-         topic: my-topic
-       #    restart: unless-stopped
-       expose:
-         - "8080"
-       ports:
-         - "18083:8080"
-       depends_on:
-         - init-kafka
-         - kafka
-       networks:
-         - app-tier
-       deploy:
-         mode: replicated
-         #      replicas: 5
-         restart_policy:
-           condition: on-failure
+  # producer-api-3:
+  #      #    container_name: producer
+  #      build:
+  #        context: .
+  #        dockerfile: web-server/Dockerfile
+  #      environment:
+  #        kafkaURL: kafka:9092
+  #        topic: my-topic
+  #      #    restart: unless-stopped
+  #      expose:
+  #        - "8080"
+  #      ports:
+  #        - "18083:8080"
+  #      depends_on:
+  #        - init-kafka
+  #        - kafka
+  #      networks:
+  #        - app-tier
+  #      deploy:
+  #        mode: replicated
+  #        #      replicas: 5
+  #        restart_policy:
+  #          condition: on-failure
 
   consumer:
     container_name: consumer
@@ -134,6 +137,8 @@ services:
     environment:
       kafkaURL: kafka:9092
       topic: my-topic
+    ports:
+      - "69:420"
     depends_on:
       - init-kafka
       - kafka
@@ -157,13 +162,13 @@ services:
     networks:
       - app-tier
 
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "18070:8080"
-      - "19090:9090"
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "18070:8080"
+  #     - "19090:9090"
 
 #volumes:
 #  kafka_data:
